@@ -34,7 +34,7 @@ export default function IconsLembretes(props: {
         <Pressable onPress={() => props.callbackRemover()}>
           <Ionicons
             style={styles.icons}
-            name="remove"
+            name="trash"
             size={30}
             color="#e64c4c"
           />
