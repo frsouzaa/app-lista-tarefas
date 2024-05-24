@@ -22,12 +22,15 @@ interface Lembrete {
 export default function App() {
   const [lembrete, setLembrete] = useState<string>("");
   const [lembretes, setLembretes] = useState<Lembrete[]>([]);
+  const [lembretesOriginais, setLembretesOriginais] = useState<Lembrete[]>([]);
 
   const adicionaLembrete = (): void => {
     if (lembrete.trim() === "") return;
-    setLembretes([
-      { texto: lembrete, id: Date.now().toString(), editando: false },
-      ...lembretes,
+    const id = Date.now().toString();
+    setLembretes([{ texto: lembrete, id: id, editando: false }, ...lembretes]);
+    setLembretesOriginais([
+      { texto: lembrete, id: id, editando: false },
+      ...lembretesOriginais,
     ]);
     setLembrete("");
   };
@@ -40,15 +43,15 @@ export default function App() {
       }
     });
     setLembretes(novaLista);
-  }
+  };
 
   const deleteLembrete = (id: string): void => {
     if (Platform.OS === "web") {
-      const res = confirm("Deseja realmente remover o lembrete?");
+      const res = confirm("Deseja realmente apagar o lembrete?");
       if (!res) return;
       setLembretes(lembretes.filter((lembrete) => lembrete.id !== id));
     } else {
-      Alert.alert("Atenção!", "Deseja realmente remover o lembrete?", [
+      Alert.alert("Atenção!", "Deseja realmente apagar o lembrete?", [
         {
           text: "Cancelar",
           style: "cancel",
@@ -68,25 +71,91 @@ export default function App() {
     }
   };
 
+  const deleteAll = (): void => {
+    if (Platform.OS === "web") {
+      const res = confirm("Deseja realmente apagar todos os lembretes?");
+      if (!res) return;
+      setLembretes([]);
+    } else {
+      Alert.alert("Atenção!", "Deseja realmente apagar todos os lembretes?", [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Sim",
+          onPress: () => {
+            ToastAndroid.showWithGravity(
+              "Todos os lembretes foram removidos!",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER
+            );
+            setLembretes([]);
+          },
+        },
+      ]);
+    }
+  };
+
   const editLembrete = (id: string): void => {
-    let novaLista = [...lembretes];
-    novaLista.forEach((lembrete) => {
+    let lembretesCopy = [...lembretes];
+    lembretesCopy.forEach((lembrete) => {
       if (lembrete.id === id) {
         lembrete.editando = true;
       }
     });
-    setLembretes(novaLista);
+    setLembretes(lembretesCopy);
   };
 
   const confirmarEdicao = (id: string): void => {
-    let novaLista = [...lembretes];
-    novaLista.forEach((lembrete) => {
+    let texto = "";
+    let lembretesCopy = [...lembretes];
+    lembretesCopy.forEach((lembrete) => {
       if (lembrete.id === id) {
         lembrete.editando = false;
+        texto = lembrete.texto;
       }
     });
-    setLembretes(novaLista);
-  }
+    let lembretesOriginaisCopy = [...lembretesOriginais];
+    if (texto.trim() === "") {
+      lembretesOriginaisCopy.forEach((lembrete) => {
+        if (lembrete.id === id) {
+          texto = lembrete.texto;
+        }
+      });
+      lembretesCopy.forEach((lembrete) => {
+        if (lembrete.id === id) {
+          lembrete.texto = texto;
+        }
+      });
+    } else {
+      lembretesOriginaisCopy.forEach((lembrete) => {
+        if (lembrete.id === id) {
+          lembrete.texto = texto;
+        }
+      });
+    }
+    setLembretesOriginais(lembretesOriginaisCopy);
+    setLembretes(lembretesCopy);
+  };
+
+  const cancelarEdicao = (id: string): void => {
+    let texto = "";
+    let lembretesOriginaisCopy = [...lembretesOriginais];
+    lembretesOriginaisCopy.forEach((lembrete) => {
+      if (lembrete.id === id) {
+        texto = lembrete.texto;
+      }
+    });
+    let lembretesCopy = [...lembretes];
+    lembretesCopy.forEach((lembrete) => {
+      if (lembrete.id === id) {
+        lembrete.editando = false;
+        lembrete.texto = texto;
+      }
+    });
+    setLembretes(lembretesCopy);
+  };
 
   return (
     <View style={styles.container}>
@@ -103,11 +172,9 @@ export default function App() {
       </Pressable>
       <Pressable
         style={styles.zerarButton}
-        onPress={() => {
-          setLembretes([]);
-        }}
+        onPress={deleteAll}
       >
-        <Text style={{ color: "white" }}>Zerar Lembretes</Text>
+        <Text style={{ color: "white" }}>Apagar Todos</Text>
       </Pressable>
       <FlatList
         style={styles.list}
@@ -118,7 +185,9 @@ export default function App() {
             {lembrete.item.editando ? (
               <TextInput
                 style={styles.inputEditar}
-                onChange={(event) => {atualizaLembrete(lembrete.item.id, event.nativeEvent.text )}}
+                onChange={(event) => {
+                  atualizaLembrete(lembrete.item.id, event.nativeEvent.text);
+                }}
                 // onSubmitEditing={adicionaLembrete}
                 // blurOnSubmit={false}
                 value={lembrete.item.texto}
@@ -129,7 +198,12 @@ export default function App() {
             <IconsLembretes
               callbackRemover={() => deleteLembrete(lembrete.item.id)}
               callbackEditar={() => editLembrete(lembrete.item.id)}
-              callbackConfirmar={() => {confirmarEdicao(lembrete.item.id)}}
+              callbackConfirmar={() => {
+                confirmarEdicao(lembrete.item.id);
+              }}
+              callbackCancelar={() => {
+                cancelarEdicao(lembrete.item.id);
+              }}
               status={lembrete.item.editando}
             />
           </View>
@@ -189,15 +263,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     backgroundColor: "#e0e0e0",
-    margin: 5,
+    marginTop: 5,
+    marginLeft: 10,
+    marginRight: 5,
     flex: 1,
   },
   inputEditar: {
     flex: 1,
     backgroundColor: "#f1f1f1",
     borderRadius: 5,
-    margin: 5,
+    marginTop: 5,
+    marginLeft: 10,
+    marginRight: 5,
     padding: 10,
     textAlign: "center",
-  }
+  },
 });

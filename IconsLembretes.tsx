@@ -5,6 +5,7 @@ export default function IconsLembretes(props: {
   callbackEditar: Function;
   callbackRemover: Function;
   callbackConfirmar: Function;
+  callbackCancelar: Function;
   status: boolean;
 }) {
   return (
@@ -19,22 +20,36 @@ export default function IconsLembretes(props: {
           />
         </Pressable>
       )}
-      <Pressable onPress={() => props.callbackRemover()}>
-        <Ionicons
-          style={styles.icons}
-          name="remove"
-          size={30}
-          color="#e64c4c"
-        />
-      </Pressable>
-      <Pressable onPress={() => props.callbackEditar()}>
-        <Ionicons
-          style={styles.icons}
-          name="pencil-square-o"
-          size={30}
-          color="#000000"
-        />
-      </Pressable>
+      {props.status && (
+        <Pressable onPress={() => props.callbackCancelar()}>
+          <Ionicons
+            style={styles.icons}
+            name="remove"
+            size={30}
+            color="#e64c4c"
+          />
+        </Pressable>
+      )}
+      {!props.status && (
+        <Pressable onPress={() => props.callbackRemover()}>
+          <Ionicons
+            style={styles.icons}
+            name="remove"
+            size={30}
+            color="#e64c4c"
+          />
+        </Pressable>
+      )}
+      {!props.status && (
+        <Pressable onPress={() => props.callbackEditar()}>
+          <Ionicons
+            style={styles.icons}
+            name="pencil-square-o"
+            size={30}
+            color="#000000"
+          />
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -47,5 +62,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    marginRight: 5,
   },
 });
