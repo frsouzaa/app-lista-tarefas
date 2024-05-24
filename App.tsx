@@ -188,8 +188,8 @@ export default function App() {
                 onChange={(event) => {
                   atualizaLembrete(lembrete.item.id, event.nativeEvent.text);
                 }}
-                // onSubmitEditing={adicionaLembrete}
-                // blurOnSubmit={false}
+                onSubmitEditing={() => confirmarEdicao(lembrete.item.id)}
+                blurOnSubmit={false}
                 value={lembrete.item.texto}
               ></TextInput>
             ) : (
