@@ -15,38 +15,17 @@ export default function IconsRedesSociais() {
     <View style={styles.icons}>
       <Pressable
         onPress={() => {
-          openLink("https://linkedin.com");
+          openLink("https://www.linkedin.com/in/frs15/");
         }}
       >
         <Ionicons name="linkedin" size={32} color="#0e76a8" />
       </Pressable>
       <Pressable
         onPress={() => {
-          openLink("https://github.com");
+          openLink("https://github.com/frsouzaa");
         }}
       >
         <Ionicons name="github" size={32} color="#0d74e7" />
-      </Pressable>
-      <Pressable
-        onPress={() => {
-          openLink("https://x.com");
-        }}
-      >
-        <Ionicons name="twitter" size={32} color="#08a0e9" />
-      </Pressable>
-      <Pressable
-        onPress={() => {
-          openLink("https://telegram.com");
-        }}
-      >
-        <Ionicons name="telegram" size={32} color="#24A1DE" />
-      </Pressable>
-      <Pressable
-        onPress={() => {
-          openLink("https://facebook.com");
-        }}
-      >
-        <Ionicons name="facebook" size={32} color="#1877F2" />
       </Pressable>
     </View>
   );
