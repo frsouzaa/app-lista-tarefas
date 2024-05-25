@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import IconsRedesSociais from "./IconsRedesSociais";
 import IconsLembretes from "./IconsLembretes";
+import axios from "axios";
 
 interface Lembrete {
   texto: string;
@@ -23,6 +24,13 @@ export default function App() {
   const [lembrete, setLembrete] = useState<string>("");
   const [lembretes, setLembretes] = useState<Lembrete[]>([]);
   const [lembretesOriginais, setLembretesOriginais] = useState<Lembrete[]>([]);
+  useEffect(() => {
+    const vai = async () => {
+      const res = (await axios.get("http://localhost:8080/lembretes-mysql")).data;
+      setLembretes(res);
+    }
+    vai();
+  }, []);
 
   const adicionaLembrete = (): void => {
     if (lembrete.trim() === "") return;
@@ -170,10 +178,7 @@ export default function App() {
       <Pressable style={styles.adicionarButton} onPress={adicionaLembrete}>
         <Text>Adicionar Lembrete</Text>
       </Pressable>
-      <Pressable
-        style={styles.zerarButton}
-        onPress={deleteAll}
-      >
+      <Pressable style={styles.zerarButton} onPress={deleteAll}>
         <Text style={{ color: "white" }}>Apagar Todos</Text>
       </Pressable>
       <FlatList
