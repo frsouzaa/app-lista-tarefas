@@ -26,7 +26,7 @@ export default function App() {
   const [lembretesOriginais, setLembretesOriginais] = useState<Lembrete[]>([]);
   useEffect(() => {
     const vai = async () => {
-      const res = (await axios.get("http://localhost:8080/lembretes-mysql")).data;
+      const res = (await axios.get("http://localhost:8080/lembretes")).data;
       setLembretes(res);
     }
     vai();
